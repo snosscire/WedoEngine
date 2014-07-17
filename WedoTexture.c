@@ -1,0 +1,15 @@
+#include "ferite.h"
+#include "SDL.h"
+
+#include "WedoFerite.h"
+
+FE_NATIVE_FUNCTION( _WedoTexture_FeriteDestructor ) {
+	FeriteObject *self = FE_CONTAINER_TO_OBJECT;
+	SDL_Texture *texture = self->odata;
+	if( texture ) {
+		SDL_DestroyTexture(texture);
+		self->odata = NULL;
+	}
+	self = NULL;
+	FE_RETURN_VOID;
+}

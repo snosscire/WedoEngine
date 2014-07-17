@@ -1,0 +1,30 @@
+namespace modifies Engine {
+	class KeyboardEvent {
+		number type;
+		number key;
+	}
+	class MouseButtonEvent {
+		number type;
+		number device;
+		number button;
+		number x;
+		number y;
+	}
+	class MouseMotionEvent {
+		number type;
+		number device;
+		number x;
+		number y;
+		number xRelative;
+		number yRelative;
+	}
+	class QuitEvent {
+		number type;
+	}
+	class UnhandledEvent {
+		number type;
+	}
+	function renderTexture( object texture, number x, number y ) {
+		.renderTexture(texture, x, y, texture.width, texture.height);
+	}
+}

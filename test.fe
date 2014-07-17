@@ -1,0 +1,58 @@
+uses 'WedoEngine/Engine';
+
+number keepRunning = true;
+
+object playerTexture;
+number playerX;
+number playerY;
+boolean playerMoveLeft;
+boolean playerMoveRight;
+boolean playerMoveUp;
+boolean playerMoveDown;
+
+Engine.createWindow("Secret Projet", 640, 480);
+
+playerTexture = Engine.loadTexture("test.png");
+
+while( keepRunning ) {
+	object event = Engine.nextEvent();
+	while( event ) {
+		if( event.type == Engine.EVENT_QUIT ) {
+			keepRunning = false;
+			break;
+		} else if( event.type == Engine.EVENT_KEYDOWN ) {
+			if( event.key == Engine.KEY_LEFT )
+				playerMoveLeft = true;
+			if( event.key == Engine.KEY_RIGHT )
+				playerMoveRight = true;
+			if( event.key == Engine.KEY_UP )
+				playerMoveUp = true;
+			if( event.key == Engine.KEY_DOWN )
+				playerMoveDown = true;
+		} else if( event.type == Engine.EVENT_KEYUP ) {
+			if( event.key == Engine.KEY_LEFT )
+				playerMoveLeft = false;
+			if( event.key == Engine.KEY_RIGHT )
+				playerMoveRight = false;
+			if( event.key == Engine.KEY_UP )
+				playerMoveUp = false;
+			if( event.key == Engine.KEY_DOWN )
+				playerMoveDown = false;
+		}
+		event = Engine.nextEvent();
+	}
+
+	if( playerMoveLeft )
+		playerX -= 1;
+	if( playerMoveRight )
+		playerX += 1;
+	if( playerMoveUp )
+		playerY -= 1;
+	if( playerMoveDown )
+		playerY += 1;
+
+	Engine.clearScreen();
+	Engine.renderTexture(playerTexture, playerX, playerY);
+	Engine.updateScreen();	
+}
+
