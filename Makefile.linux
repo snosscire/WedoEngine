@@ -1,0 +1,20 @@
+build_directory = Build/Linux
+cc = gcc -g
+flags = -Wall `sdl2-config --cflags`
+libs = -lm -ldl Libraries/libferite.a `sdl2-config --libs` -lSDL2_image
+sources = $(wildcard *.c)
+_objects = $(sources:.c=.o)
+objects = $(patsubst %,$(build_directory)/%,$(_objects))
+program = $(build_directory)/game
+
+all: $(objects) $(program)
+
+$(program): $(objects)
+	$(cc) $(objects) -o $(program) $(libs)
+
+$(build_directory)/%.o: %.c
+	$(cc) -o $@ $(flags) -c $<
+
+clean:
+	rm -v $(build_directory)/*.o $(program)
+

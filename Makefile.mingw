@@ -1,0 +1,44 @@
+build_directory = Build/Windows
+cc = i686-w64-mingw32-gcc -g
+flags = -Wall -IIncludes/ferite -IIncludes/SDL2 -Dmain=SDL_main
+libs = -LLibraries/i686-w64-mingw32 \
+	-lmingw32 \
+	-lSDL2main \
+	-lSDL2 \
+	-lSDL2_image \
+	-mwindows \
+	-Wl,--no-undefined \
+	-lm \
+	-ldinput8 \
+	-ldxguid \
+	-ldxerr8 \
+	-luser32 \
+	-lgdi32 \
+	-lwinmm \
+	-limm32 \
+	-lole32 \
+	-loleaut32 \
+	-lshell32 \
+	-lversion \
+	-luuid \
+	-lpng \
+	-lz \
+	-lferite \
+	-static \
+	-static-libgcc 
+sources = $(wildcard *.c)
+_objects = $(sources:.c=.o)
+objects = $(patsubst %,$(build_directory)/%,$(_objects))
+program = game.exe
+
+all: $(objects) $(program)
+
+$(program): $(objects)
+	$(cc) $(objects) -o $(build_directory)/$(program) $(libs)
+
+$(build_directory)/%.o: %.c
+	$(cc) -o $@ $(flags) -c $<
+
+clean:
+	rm -v $(build_directory)/*.o $(build_directory)/$(program)
+
