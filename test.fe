@@ -10,9 +10,9 @@ boolean playerMoveRight;
 boolean playerMoveUp;
 boolean playerMoveDown;
 
-Engine.createWindow("Secret Projet", 640, 480);
+Engine.createWindow("Secret Project", 640, 480);
 
-playerTexture = Engine.loadTexture("test.png");
+playerTexture = Engine.loadTexture("Resources/test.png");
 
 while( keepRunning ) {
 	object event = Engine.nextEvent();
