@@ -1,0 +1,26 @@
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteArraySize )
+{
+	FeriteUnifiedArray *a = NULL;
+	ferite_get_parameters(params, 1, &a);
+	FE_RETURN_LONG( a->size );
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteArrayKeyExists )
+{
+	FeriteUnifiedArray *a = NULL;
+	FeriteString *key = NULL;
+	ferite_get_parameters(params, 2, &a, &key);
+	if( ferite_hash_get(script, a->hash, key->data) != NULL )
+		FE_RETURN_TRUE;
+	FE_RETURN_FALSE;
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteArrayDeleteAt )
+{
+	FeriteUnifiedArray *a = NULL;
+	double index = 0.0;
+	ferite_get_parameters(params, 2, &a, &index);
+	ferite_uarray_del_index(script, a, (int)index);
+	FE_RETURN_VOID;
+}
+

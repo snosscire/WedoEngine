@@ -4,6 +4,8 @@
 static SDL_Window   *_WedoEngine_Window = NULL;
 static SDL_Renderer *_WedoEngine_Renderer = NULL;
 
+#include "WedoEngineFeriteArray.c.in"
+
 FeriteVariable *_WedoEngine_CreateFeriteKeyboardEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, namespace, "KeyboardEvent", FENS_CLS);
 	FeriteVariable *event_variable = ferite_build_object(script, nsb->data);
@@ -96,8 +98,12 @@ void _WedoEngine_TerminateFerite() {
 void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, script->mainns, "Engine", FENS_NS);
 	FeriteNamespace *engine_namespace = (nsb AND nsb->data ? nsb->data : ferite_register_namespace(script, "Engine", script->mainns));
+	FeriteNamespace *array_namespace = NULL;
 	FeriteClass *image_class = ferite_register_inherited_class(script, engine_namespace, "Image", NULL);
 	FeriteClass *texture_class = ferite_register_inherited_class(script, engine_namespace, "Texture", NULL);
+
+	nsb = ferite_find_namespace(script, script->mainns, "Array", FENS_NS);
+	array_namespace = (nsb && nsb->data ? nsb->data : ferite_register_namespace(script, "Array", script->mainns));
 
 	#define REGISTER_NAMESPACE_NUMBER_LONG_VAR( SCRIPT, NAMESPACE, NAME, VALUE ) \
 		ferite_register_ns_variable(SCRIPT, NAMESPACE, NAME, ferite_create_number_long_variable(SCRIPT, NAME, VALUE, FE_STATIC));	
@@ -105,6 +111,10 @@ void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 		ferite_register_ns_function(SCRIPT, NAMESPACE, ferite_create_external_function(SCRIPT, NAME, FUNCTION, PARAMETERS));
 	#define REGISTER_CLASS_FUNCTION( SCRIPT, CLASS, NAME, PARAMETERS, FUNCTION ) \
 		ferite_register_class_function(SCRIPT, CLASS, ferite_create_external_function(SCRIPT, NAME, FUNCTION, PARAMETERS), FE_FALSE);
+
+	REGISTER_NAMESPACE_FUNCTION(script, array_namespace, "size", "a", _WedoEngine_FeriteArraySize);
+	REGISTER_NAMESPACE_FUNCTION(script, array_namespace, "keyExists", "as", _WedoEngine_FeriteArrayKeyExists);
+	REGISTER_NAMESPACE_FUNCTION(script, array_namespace, "deleteAt", "an", _WedoEngine_FeriteArrayDeleteAt);
 
 	REGISTER_NAMESPACE_NUMBER_LONG_VAR(script, engine_namespace, "MESSAGEBOX_ERROR", SDL_MESSAGEBOX_ERROR);
 	REGISTER_NAMESPACE_NUMBER_LONG_VAR(script, engine_namespace, "MESSAGEBOX_WARNING", SDL_MESSAGEBOX_WARNING);
@@ -230,3 +240,4 @@ int WedoEngine_ExecuteScript( int argc, char *argv[], char *name ) {
 
 	return success;
 }
+
