@@ -1,7 +1,3 @@
-#include "ferite.h"
-#include "SDL.h"
-
-#include "WedoFerite.h"
 
 FE_NATIVE_FUNCTION( _WedoTexture_FeriteDestructor ) {
 	FeriteObject *self = FE_CONTAINER_TO_OBJECT;

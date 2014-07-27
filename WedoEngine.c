@@ -1,12 +1,29 @@
 #include "WedoEngine.h"
-#include "WedoFerite.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
+#include "ferite.h"
+#include "SDL.h"
+#include "SDL_image.h"
+
+#ifndef FALSE
+	#define FALSE 0
+	#define TRUE !FALSE
+#endif
+
+#define NOT !
+#define AND &&
+#define OR ||
+
+#define OBJECT_SET_NUMBER_LONG_VAR( SCRIPT, VARIABLE, NAME, VALUE ) \
+	ferite_object_set_var(SCRIPT, VAO(VARIABLE), NAME, ferite_create_number_long_variable(SCRIPT, NAME, VALUE, FE_STATIC));
 
 static SDL_Window   *_WedoEngine_Window = NULL;
 static SDL_Renderer *_WedoEngine_Renderer = NULL;
 
-#include "WedoEngineFeriteArray.c.in"
-
-FeriteVariable *_WedoEngine_CreateFeriteKeyboardEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
+static FeriteVariable *_WedoEngine_CreateFeriteKeyboardEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, namespace, "KeyboardEvent", FENS_CLS);
 	FeriteVariable *event_variable = ferite_build_object(script, nsb->data);
 
@@ -16,7 +33,7 @@ FeriteVariable *_WedoEngine_CreateFeriteKeyboardEvent( FeriteScript *script, Fer
 	return event_variable;
 }
 
-FeriteVariable *_WedoEngine_CreateFeriteMouseButtonEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
+static FeriteVariable *_WedoEngine_CreateFeriteMouseButtonEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, namespace, "MouseButtonEvent", FENS_CLS);
 	FeriteVariable *event_variable = ferite_build_object(script, nsb->data);
 
@@ -29,7 +46,7 @@ FeriteVariable *_WedoEngine_CreateFeriteMouseButtonEvent( FeriteScript *script, 
 	return event_variable;
 }
 
-FeriteVariable *_WedoEngine_CreateFeriteMouseMotionEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event )  {
+static FeriteVariable *_WedoEngine_CreateFeriteMouseMotionEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event )  {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, namespace, "MouseMotionEvent", FENS_CLS);
 	FeriteVariable *event_variable = ferite_build_object(script, nsb->data);
 
@@ -43,38 +60,38 @@ FeriteVariable *_WedoEngine_CreateFeriteMouseMotionEvent( FeriteScript *script, 
 	return event_variable;
 }
 
-FeriteVariable *_WedoEngine_CreateFeriteQuitEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
+static FeriteVariable *_WedoEngine_CreateFeriteQuitEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, namespace, "QuitEvent", FENS_CLS);
 	FeriteVariable *event_variable = ferite_build_object(script, nsb->data);
 	OBJECT_SET_NUMBER_LONG_VAR(script, event_variable, "type", event->quit.type);
 	return event_variable;
 }
 
-FeriteVariable *_WedoEngine_CreateFeriteUnhandledEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
+static FeriteVariable *_WedoEngine_CreateFeriteUnhandledEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, namespace, "UnhandledEvent", FENS_CLS);
 	FeriteVariable *event_variable = ferite_build_object(script, nsb->data);
 	OBJECT_SET_NUMBER_LONG_VAR(script, event_variable, "type", event->type);
 	return event_variable;
 }
 
-int _WedoEngine_InitializeSDL() {
+static int _WedoEngine_InitializeSDL() {
 	Uint32 flags = SDL_INIT_VIDEO | SDL_INIT_EVENTS;
 	if ( SDL_Init(flags) < 0 )
 		return FALSE;
 	return TRUE;
 }
 
-int _WedoEngine_InitializeENet() {
+static int _WedoEngine_InitializeENet() {
 	return TRUE;
 }
 
-int _WedoEngine_InitializeFerite() {
+static int _WedoEngine_InitializeFerite() {
 	if( ferite_init(0, NULL) )
 		return TRUE;
 	return FALSE;
 }
 
-void _WedoEngine_TerminateSDL() {
+static void _WedoEngine_TerminateSDL() {
 	if( _WedoEngine_Renderer ) {
 		SDL_DestroyRenderer(_WedoEngine_Renderer);
 		_WedoEngine_Renderer = NULL;
@@ -87,15 +104,36 @@ void _WedoEngine_TerminateSDL() {
 	SDL_Quit();
 }
 
-void _WedoEngine_TerminateENet() {
+static void _WedoEngine_TerminateENet() {
 
 }
 
-void _WedoEngine_TerminateFerite() {
+static void _WedoEngine_TerminateFerite() {
 	ferite_deinit();
 }
 
-void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
+static void _WedoEngine_SetWindow( SDL_Window *window ) {
+	_WedoEngine_Window = window;
+}
+
+static void _WedoEngine_SetRenderer( SDL_Renderer *renderer ) {
+	_WedoEngine_Renderer = renderer;
+}
+
+static SDL_Window *_WedoEngine_GetWindow() {
+	return _WedoEngine_Window;
+}
+
+static SDL_Renderer *_WedoEngine_GetRenderer() {
+	return _WedoEngine_Renderer;
+}
+
+#include "WedoEngineFerite.c.in"
+#include "WedoEngineFeriteArray.c.in"
+#include "WedoEngineFeriteImage.c.in"
+#include "WedoEngineFeriteTexture.c.in"
+
+static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, script->mainns, "Engine", FENS_NS);
 	FeriteNamespace *engine_namespace = (nsb AND nsb->data ? nsb->data : ferite_register_namespace(script, "Engine", script->mainns));
 	FeriteNamespace *array_namespace = NULL;
@@ -163,22 +201,6 @@ void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_CLASS_FUNCTION(script, image_class, "toTexture", "", _WedoImage_FeriteToTexture);
 
 	REGISTER_CLASS_FUNCTION(script, texture_class, "destructor", "", _WedoTexture_FeriteDestructor);
-}
-
-void _WedoEngine_SetWindow( SDL_Window *window ) {
-	_WedoEngine_Window = window;
-}
-
-void _WedoEngine_SetRenderer( SDL_Renderer *renderer ) {
-	_WedoEngine_Renderer = renderer;
-}
-
-SDL_Window *_WedoEngine_GetWindow() {
-	return _WedoEngine_Window;
-}
-
-SDL_Renderer *_WedoEngine_GetRenderer() {
-	return _WedoEngine_Renderer;
 }
 
 void WedoEngine_Terminate() {

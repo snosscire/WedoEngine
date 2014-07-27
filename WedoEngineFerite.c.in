@@ -1,4 +1,3 @@
-#include "WedoEngine.h"
 
 FE_NATIVE_FUNCTION( _WedoEngine_FeritePrintLine ) {
 	FeriteString *str = NULL;

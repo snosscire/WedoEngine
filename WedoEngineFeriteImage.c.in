@@ -1,5 +1,3 @@
-#include "WedoFerite.h"
-#include "WedoEngine.h"
 
 FE_NATIVE_FUNCTION( _WedoImage_FeriteDestructor ) {
 	FeriteObject *self = FE_CONTAINER_TO_OBJECT;
