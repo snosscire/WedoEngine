@@ -1,7 +1,9 @@
 build_directory = Build/Linux
 cc = gcc -g
 flags = -Wall `sdl2-config --cflags`
-libs = -lm -ldl Libraries/libferite.a `sdl2-config --libs` -lSDL2_image
+libs = -Wl,--no-undefined -lm -ldl \
+	Libraries/x86_64-unknown-linux-gnu/libferite.a \
+	`sdl2-config --libs` -lSDL2_image
 sources = $(wildcard *.c)
 _objects = $(sources:.c=.o)
 objects = $(patsubst %,$(build_directory)/%,$(_objects))
