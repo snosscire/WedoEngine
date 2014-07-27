@@ -157,7 +157,11 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteLoadTexture ) {
 			OBJECT_SET_NUMBER_LONG_VAR(script, texture_variable, "height", surface_height);
 			MARK_VARIABLE_AS_DISPOSABLE(texture_variable);
 			FE_RETURN_VAR(texture_variable);
+		} else {
+			printf("[SDL] Error: %s\n", SDL_GetError());
 		}
+	} else {
+		printf("[SDL] Error: %s\n", SDL_GetError());
 	}
 
 	FE_RETURN_NULL_OBJECT;
