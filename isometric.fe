@@ -1,0 +1,103 @@
+uses 'WedoEngine/Engine';
+
+namespace Math {
+	function cartesianToIsometric( object point ) {
+		object isometricPoint = new Point();
+		isometricPoint.x = point.x - point.y;
+		isometricPoint.y = (point.x + point.y) / 2;
+		return isometricPoint;
+	}
+}
+
+class Point {
+	number x;
+	number y;
+}
+
+class Player {
+	number x;
+	number y;
+	object texture;
+
+	function constructor {
+		.x = 1;
+		.y = 1;
+		.texture = Engine.loadTexture("Resources/opengameart.org/friendly-dragon/1_4.png");
+	}
+}
+
+class Tile {
+	number x;
+	number y;
+	number width;
+	number height;
+	object texture;
+	
+	function render() {
+		object cartesianPoint = new Point();
+		object isometricPoint = null;
+		cartesianPoint.x = (.x * .width);
+		cartesianPoint.y = (.y * .height);
+		isometricPoint = Math.cartesianToIsometric(cartesianPoint);
+		Engine.renderTexture(.texture, isometricPoint.x + 512, isometricPoint.y);
+	}
+}
+
+class Map {
+	array tiles;
+	
+	function addTile( number x, number y, string file ) {
+		object tile = new Tile();
+		tile.texture = Engine.loadTexture(file);
+		tile.x = x;
+		tile.y = y;
+		tile.width = 128;
+		tile.height = 128;
+		.tiles[] = tile;
+	}
+	
+	function render() {
+		number size = .tiles.size();
+		for( number i; i < size; i++ ) {
+			.tiles[i].render();
+		}
+	}
+}
+
+boolean keepRunning = true;
+object map = new Map();
+object player = new Player();
+
+Engine.createWindow("Isometric test", 1280, 720);
+
+map.addTile(0, 0, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(1, 0, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(2, 0, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(3, 0, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(0, 1, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(1, 1, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(2, 1, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(3, 1, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(0, 2, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(1, 2, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(2, 2, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(3, 2, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(0, 3, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(1, 3, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(2, 3, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+map.addTile(3, 3, "Resources/opengameart.org/isometric-tile-starter-pack/concrete368a.png");
+
+while( keepRunning ) {
+	object event = Engine.nextEvent();
+	while( event ) {
+		if( event.type == Engine.EVENT_QUIT ) {
+			keepRunning = false;
+			break;
+		}
+		event = Engine.nextEvent();
+	}
+	
+	Engine.clearScreen();
+	map.render();
+	Engine.updateScreen();
+}

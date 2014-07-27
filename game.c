@@ -2,7 +2,7 @@
 
 int main( int argc, char *argv[] ) {
 	if( WedoEngine_Initialize() ) {
-		WedoEngine_ExecuteScript(argc, argv, "test.fe");
+		WedoEngine_ExecuteScript(argc, argv, "isometric.fe");
 		WedoEngine_Terminate();
 	}
 
