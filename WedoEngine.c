@@ -193,9 +193,11 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "clearScreen", "", _WedoEngine_FeriteClearScreen);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "updateScreen", "", _WedoEngine_FeriteUpdateScreen);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "nextEvent", "", _WedoEngine_FeriteNextEvent);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "currentTime", "", _WedoEngine_FeriteCurrentTime);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "loadImage", "s", _WedoEngine_FeriteLoadImage);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "loadTexture", "s", _WedoEngine_FeriteLoadTexture);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "renderTexture", "onnnn", _WedoEngine_FeriteRenderTexture);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "hasIntersection", "nnnnnnnn", _WedoEngine_FeriteHasIntersection);
 
 	REGISTER_CLASS_FUNCTION(script, image_class, "destructor", "", _WedoImage_FeriteDestructor);
 	REGISTER_CLASS_FUNCTION(script, image_class, "toTexture", "", _WedoImage_FeriteToTexture);

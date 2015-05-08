@@ -112,6 +112,12 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteNextEvent ) {
 	FE_RETURN_NULL_OBJECT;
 }
 
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteCurrentTime )
+{
+	FeriteVariable *time_variable = ferite_create_number_long_variable(script, "currentTime", SDL_GetTicks(), FE_STATIC);
+	FE_RETURN_VAR(time_variable);
+}
+
 FE_NATIVE_FUNCTION( _WedoEngine_FeriteLoadImage ) {
 	FeriteString *file = NULL;
 	SDL_Surface *surface = NULL;
@@ -186,4 +192,35 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteRenderTexture ) {
 	}
 
 	FE_RETURN_VOID;
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteHasIntersection ) {
+	double a_x = 0.0;
+	double a_y = 0.0;
+	double a_w = 0.0;
+	double a_h = 0.0;
+	double b_x = 0.0;
+	double b_y = 0.0;
+	double b_w = 0.0;
+	double b_h = 0.0;
+
+	ferite_get_parameters(params, 8, &a_x, &a_y, &a_w, &a_h, &b_x, &b_y, &b_w, &b_h);
+
+	SDL_Rect rect_a;
+	SDL_Rect rect_b;
+
+	rect_a.x = a_x;
+	rect_a.y = a_y;
+	rect_a.w = a_w;
+	rect_a.h = a_h;
+
+	rect_b.x = b_x;
+	rect_b.y = b_y;
+	rect_b.w = b_w;
+	rect_b.h = b_h;
+
+	if( SDL_HasIntersection(&rect_a, &rect_b) )
+		FE_RETURN_TRUE;
+
+	FE_RETURN_FALSE;
 }

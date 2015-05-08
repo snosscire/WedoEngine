@@ -1,3 +1,5 @@
+uses 'Array';
+
 namespace modifies Engine {
 	class KeyboardEvent {
 		number type;
