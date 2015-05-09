@@ -26,6 +26,11 @@ namespace modifies Engine {
 	class UnhandledEvent {
 		number type;
 	}
+	class INI {
+		string section;
+		string name;
+		string value;
+	}
 	function renderTexture( object texture, number x, number y ) {
 		.renderTexture(texture, x, y, texture.width, texture.height);
 	}

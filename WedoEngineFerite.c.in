@@ -224,3 +224,21 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteHasIntersection ) {
 
 	FE_RETURN_FALSE;
 }
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteParseINI ) {
+	FeriteString *file = NULL;
+
+	ferite_get_parameters(params, 1, &file);
+
+	WedoEngine_ParseINI *data = fmalloc(sizeof(WedoEngine_ParseINI));
+	FeriteVariable *list_variable = ferite_create_uarray_variable(script, "list", FE_ARRAY_DEFAULT_SIZE, FE_STATIC);
+
+	data->script = script;
+	data->array = VAUA(list_variable);
+
+	ini_parse(file->data, _WedoEngine_ParseINIHandler, data);
+
+	ffree(data);
+
+	FE_RETURN_VAR(list_variable);
+}

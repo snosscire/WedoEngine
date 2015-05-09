@@ -7,6 +7,7 @@
 #include "ferite.h"
 #include "SDL.h"
 #include "SDL_image.h"
+#include "ini.h"
 
 #ifndef FALSE
 	#define FALSE 0
@@ -19,6 +20,9 @@
 
 #define OBJECT_SET_NUMBER_LONG_VAR( SCRIPT, VARIABLE, NAME, VALUE ) \
 	ferite_object_set_var(SCRIPT, VAO(VARIABLE), NAME, ferite_create_number_long_variable(SCRIPT, NAME, VALUE, FE_STATIC));
+
+#define OBJECT_SET_STRING_VAR( SCRIPT, VARIABLE, NAME, VALUE ) \
+	ferite_object_set_var(SCRIPT, VAO(VARIABLE), NAME, ferite_create_string_variable_from_ptr(SCRIPT, NAME, VALUE, 0, FE_CHARSET_DEFAULT, FE_STATIC))
 
 static SDL_Window   *_WedoEngine_Window = NULL;
 static SDL_Renderer *_WedoEngine_Renderer = NULL;
@@ -72,6 +76,32 @@ static FeriteVariable *_WedoEngine_CreateFeriteUnhandledEvent( FeriteScript *scr
 	FeriteVariable *event_variable = ferite_build_object(script, nsb->data);
 	OBJECT_SET_NUMBER_LONG_VAR(script, event_variable, "type", event->type);
 	return event_variable;
+}
+
+typedef struct __WedoEngine_ParseINI {
+	FeriteScript *script;
+	FeriteUnifiedArray *array;
+} WedoEngine_ParseINI;
+
+static int _WedoEngine_ParseINIHandler( void *user, const char *section, const char *name, const char *value ) {
+	WedoEngine_ParseINI *data = user;
+	FeriteNamespaceBucket *nsb = NULL;
+	FeriteNamespace *engine_namespace = NULL;
+	FeriteVariable *ini_variable = NULL;
+
+	nsb = ferite_find_namespace(data->script, data->script->mainns, "Engine", FENS_NS);
+	engine_namespace = nsb->data;
+
+	nsb = ferite_find_namespace(data->script, engine_namespace, "INI", FENS_CLS);
+	ini_variable = ferite_build_object(data->script, nsb->data);
+
+	OBJECT_SET_STRING_VAR(data->script, ini_variable, "section", (char *)section);
+	OBJECT_SET_STRING_VAR(data->script, ini_variable, "name", (char *)name);
+	OBJECT_SET_STRING_VAR(data->script, ini_variable, "value", (char *)value);
+
+	ferite_uarray_add(data->script, data->array, ini_variable, NULL, FE_ARRAY_ADD_AT_END);
+
+	return 1;
 }
 
 static int _WedoEngine_InitializeSDL() {
@@ -198,6 +228,7 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "loadTexture", "s", _WedoEngine_FeriteLoadTexture);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "renderTexture", "onnnn", _WedoEngine_FeriteRenderTexture);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "hasIntersection", "nnnnnnnn", _WedoEngine_FeriteHasIntersection);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "parseINI", "s", _WedoEngine_FeriteParseINI);
 
 	REGISTER_CLASS_FUNCTION(script, image_class, "destructor", "", _WedoImage_FeriteDestructor);
 	REGISTER_CLASS_FUNCTION(script, image_class, "toTexture", "", _WedoImage_FeriteToTexture);
