@@ -30,6 +30,10 @@ namespace modifies Engine {
 		string section;
 		string name;
 		string value;
+
+		function toString() {
+			return "[${.section}] ${.name}: ${.value}";
+		}
 	}
 	function renderTexture( object texture, number x, number y ) {
 		.renderTexture(texture, x, y, texture.width, texture.height);
