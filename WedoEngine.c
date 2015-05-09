@@ -1,7 +1,10 @@
 #include "WedoEngine.h"
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <errno.h>
+#include <unistd.h>
 #include <time.h>
 
 #include "ferite.h"
@@ -160,6 +163,8 @@ static SDL_Renderer *_WedoEngine_GetRenderer() {
 
 #include "WedoEngineFerite.c.in"
 #include "WedoEngineFeriteArray.c.in"
+#include "WedoEngineFeriteNumber.c.in"
+#include "WedoEngineFeriteString.c.in"
 #include "WedoEngineFeriteImage.c.in"
 #include "WedoEngineFeriteTexture.c.in"
 
@@ -167,11 +172,19 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, script->mainns, "Engine", FENS_NS);
 	FeriteNamespace *engine_namespace = (nsb AND nsb->data ? nsb->data : ferite_register_namespace(script, "Engine", script->mainns));
 	FeriteNamespace *array_namespace = NULL;
+	FeriteNamespace *number_namespace = NULL;
+	FeriteNamespace *string_namespace = NULL;
 	FeriteClass *image_class = ferite_register_inherited_class(script, engine_namespace, "Image", NULL);
 	FeriteClass *texture_class = ferite_register_inherited_class(script, engine_namespace, "Texture", NULL);
 
 	nsb = ferite_find_namespace(script, script->mainns, "Array", FENS_NS);
 	array_namespace = (nsb && nsb->data ? nsb->data : ferite_register_namespace(script, "Array", script->mainns));
+
+	nsb = ferite_find_namespace(script, script->mainns, "Number", FENS_NS);
+	number_namespace = (nsb && nsb->data ? nsb->data : ferite_register_namespace(script, "Number", script->mainns));
+
+	nsb = ferite_find_namespace(script, script->mainns, "String", FENS_NS);
+	string_namespace = (nsb && nsb->data ? nsb->data : ferite_register_namespace(script, "String", script->mainns));
 
 	#define REGISTER_NAMESPACE_NUMBER_LONG_VAR( SCRIPT, NAMESPACE, NAME, VALUE ) \
 		ferite_register_ns_variable(SCRIPT, NAMESPACE, NAME, ferite_create_number_long_variable(SCRIPT, NAME, VALUE, FE_STATIC));	
@@ -183,6 +196,14 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_NAMESPACE_FUNCTION(script, array_namespace, "size", "a", _WedoEngine_FeriteArraySize);
 	REGISTER_NAMESPACE_FUNCTION(script, array_namespace, "keyExists", "as", _WedoEngine_FeriteArrayKeyExists);
 	REGISTER_NAMESPACE_FUNCTION(script, array_namespace, "deleteAt", "an", _WedoEngine_FeriteArrayDeleteAt);
+
+	REGISTER_NAMESPACE_FUNCTION(script, number_namespace, "round", "n", _WedoEngine_FeriteNumberRound);
+	REGISTER_NAMESPACE_FUNCTION(script, number_namespace, "floor", "n", _WedoEngine_FeriteNumberFloor);
+
+	REGISTER_NAMESPACE_FUNCTION(script, string_namespace, "length", "s", _WedoEngine_FeriteStringLength);
+	REGISTER_NAMESPACE_FUNCTION(script, string_namespace, "byteToNumber", "s", _WedoEngine_FeriteStringByteToNumber);
+	REGISTER_NAMESPACE_FUNCTION(script, string_namespace, "toNumber", "s", _WedoEngine_FeriteStringToNumber);
+	REGISTER_NAMESPACE_FUNCTION(script, string_namespace, "toLower", "s", _WedoEngine_FeriteStringToLower);
 
 	REGISTER_NAMESPACE_NUMBER_LONG_VAR(script, engine_namespace, "MESSAGEBOX_ERROR", SDL_MESSAGEBOX_ERROR);
 	REGISTER_NAMESPACE_NUMBER_LONG_VAR(script, engine_namespace, "MESSAGEBOX_WARNING", SDL_MESSAGEBOX_WARNING);

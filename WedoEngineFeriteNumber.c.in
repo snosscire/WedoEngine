@@ -1,0 +1,14 @@
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteNumberRound )
+{
+	double number = 0.0;
+	ferite_get_parameters(params, 1, &number);
+	int sign = (number < 0 ? -1 : 1);
+	FE_RETURN_LONG((long)(number + (0.5 * sign)));
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteNumberFloor )
+{
+	double number = 0.0;
+	ferite_get_parameters(params, 1, &number);
+	FE_RETURN_DOUBLE(floor(number));
+}
