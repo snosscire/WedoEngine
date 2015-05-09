@@ -199,6 +199,7 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 
 	REGISTER_NAMESPACE_FUNCTION(script, number_namespace, "round", "n", _WedoEngine_FeriteNumberRound);
 	REGISTER_NAMESPACE_FUNCTION(script, number_namespace, "floor", "n", _WedoEngine_FeriteNumberFloor);
+	REGISTER_NAMESPACE_FUNCTION(script, number_namespace, "numberToByte", "n", _WedoEngine_FeriteNumberToByte);
 
 	REGISTER_NAMESPACE_FUNCTION(script, string_namespace, "length", "s", _WedoEngine_FeriteStringLength);
 	REGISTER_NAMESPACE_FUNCTION(script, string_namespace, "byteToNumber", "s", _WedoEngine_FeriteStringByteToNumber);

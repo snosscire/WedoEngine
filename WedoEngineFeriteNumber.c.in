@@ -12,3 +12,18 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteNumberFloor )
 	ferite_get_parameters(params, 1, &number);
 	FE_RETURN_DOUBLE(floor(number));
 }
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteNumberToByte ) {
+	double number = 0.0;
+	ferite_get_parameters(params, 1, &number);
+	FeriteString *string = NULL;
+
+	if( (long)number >= 0 || (long)number <= 255 ) {
+		char c = (unsigned char)number;
+		string = ferite_str_new(script, &c, 1, FE_CHARSET_DEFAULT);
+	} else {
+		string = ferite_str_new(script, NULL, 0, FE_CHARSET_DEFAULT);
+	}
+
+	FE_RETURN_STR(string, FE_TRUE);
+}
