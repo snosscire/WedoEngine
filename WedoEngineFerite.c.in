@@ -242,3 +242,18 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteParseINI ) {
 
 	FE_RETURN_VAR(list_variable);
 }
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteWriteToFile ) {
+	FeriteString *filename = NULL;
+	FeriteString *content = NULL;
+
+	ferite_get_parameters(params, 2, &filename, &content);
+
+	FILE *file = fopen(filename->data, "w");
+	if( file ) {
+		fprintf(file, "%s", content->data);
+		fclose(file);
+		FE_RETURN_TRUE;
+	}
+	FE_RETURN_FALSE;
+}

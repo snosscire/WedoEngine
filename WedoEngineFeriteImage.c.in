@@ -1,3 +1,24 @@
+static Uint32 _WedoImage_GetPixel( SDL_Surface *surface, Uint32 x, Uint32 y ) {
+	int bpp = surface->format->BytesPerPixel;
+	/* Here p is the address to the pixel we want to retrieve */
+	Uint8 *p = (Uint8 *) surface->pixels + y * surface->pitch + x * bpp;
+	switch( bpp ) {
+		case 1:
+			return *p;
+		case 2:
+			return *(Uint16 *)p;
+	    case 3:
+			if( SDL_BYTEORDER == SDL_BIG_ENDIAN ) {
+				return p[0] << 16 | p[1] << 8 | p[2];
+			} else {
+				return p[0] | p[1] << 8 | p[2] << 16;
+			}
+		case 4:
+			return *(Uint32 *)p;
+		default:
+			return 0; /* shouldn't happen, but avoids warnings */
+	}
+}
 
 FE_NATIVE_FUNCTION( _WedoImage_FeriteDestructor ) {
 	FeriteObject *self = FE_CONTAINER_TO_OBJECT;
@@ -28,4 +49,25 @@ FE_NATIVE_FUNCTION( _WedoImage_FeriteToTexture ) {
 	}
 
 	FE_RETURN_NULL_OBJECT;
+}
+
+FE_NATIVE_FUNCTION( _WedoImage_FeriteGetColor ) {
+	FeriteObject *self = FE_CONTAINER_TO_OBJECT;
+	SDL_Surface *surface = (SDL_Surface *)self->odata;
+	double r, g, b = 0.0;
+	ferite_get_parameters(params, 3, &r, &g, &b);
+	FE_RETURN_LONG(SDL_MapRGB(surface->format, (Uint8)r, (Uint8)g, (Uint8)b));
+}
+
+FE_NATIVE_FUNCTION( _WedoImage_FeriteGetPixel ) {
+	FeriteObject *self = FE_CONTAINER_TO_OBJECT;
+	SDL_Surface *surface = self->odata;
+	double x = 0.0;
+	double y = 0.0;
+
+	ferite_get_parameters(params, 2, &x, &y);
+
+	if( surface )
+		FE_RETURN_LONG(_WedoImage_GetPixel(surface, (Uint32)x, (Uint32)y));
+	FE_RETURN_LONG(0);
 }

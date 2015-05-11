@@ -28,4 +28,40 @@ namespace modifies Array {
 		}
 		return result;
 	}
+
+	function append( array a, array b ) {
+		b.each() using ( value ) {
+			a[] = value;
+		};
+		return a;
+	}
+
+	function sort( array list ) {
+		array left;
+		array right;
+		number size;
+		number pivot;
+
+		if( not recipient() )
+			return list;
+
+		if( list.size() < 2 )
+			return list;
+
+		pivot = deliver(list[0]);
+		list.del(0);
+
+		size = list.size();
+		for( number i = 0; i < size; i++ ) {
+			if( deliver(list[i]) < pivot )
+				left[] = list[i];
+			else
+				right[] = list[i];
+		}
+
+		left = left.sort() using recipient();
+		right = right.sort() using recipient();
+
+		return left.append([ pivot ].append(right));
+	}
 }
