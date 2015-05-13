@@ -172,6 +172,26 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteLoadTexture ) {
 	FE_RETURN_NULL_OBJECT;
 }
 
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteLoadFont ) {
+	FeriteString *file = NULL;
+	double size = 0.0;
+	TTF_Font *font = NULL;
+
+	ferite_get_parameters(params, 2, &file, &size);
+
+	font = TTF_OpenFont(file->data, size);
+
+	if( font ) {
+		FeriteNamespaceBucket *nsb = ferite_find_namespace(script, script->mainns, "Engine.Font", FENS_CLS);
+		FeriteVariable *font_variable = ferite_build_object(script, nsb->data);
+		VAO(font_variable)->odata = font;
+		MARK_VARIABLE_AS_DISPOSABLE(font_variable);
+		FE_RETURN_VAR(font_variable);
+	}
+
+	FE_RETURN_NULL_OBJECT;
+}
+
 FE_NATIVE_FUNCTION( _WedoEngine_FeriteRenderTexture ) {
 	FeriteObject *texture_object = NULL;
 	double x = 0.0;
@@ -189,6 +209,51 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteRenderTexture ) {
 		destination.w = width;
 		destination.h = height;
 		SDL_RenderCopy(_WedoEngine_GetRenderer(), texture, NULL, &destination);
+	}
+
+	FE_RETURN_VOID;
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteRenderText ) {
+	FeriteObject *font_object = NULL;
+	FeriteString *text = NULL;
+	double red = 0.0;
+	double green = 0.0;
+	double blue = 0.0;
+	double x = 0.0;
+	double y = 0.0;
+
+	ferite_get_parameters(params, 7, &font_object, &text, &red, &green, &blue, &x, &y);
+
+	if( ferite_object_is_subclass(font_object, "Font") ) {
+		TTF_Font *font = font_object->odata;
+		SDL_Color color = { red, green, blue };
+		SDL_Surface *surface = TTF_RenderText_Solid(font, text->data, color);
+
+		if( surface ) {
+			SDL_Texture *texture = SDL_CreateTextureFromSurface(_WedoEngine_GetRenderer(), surface);
+
+			if( texture ) {
+				SDL_Rect destination;
+				destination.x = x;
+				destination.y = y;
+				destination.w = surface->w;
+				destination.h = surface->h;
+
+				if( SDL_RenderCopy(_WedoEngine_GetRenderer(), texture, NULL, &destination) < 0 )
+					printf("[SDL] Error: %s\n", SDL_GetError());
+
+				SDL_DestroyTexture(texture);
+				texture = NULL;
+			} else {
+				printf("[SDL] Error: %s\n", SDL_GetError());
+			}
+
+			SDL_FreeSurface(surface);
+			surface = NULL;
+		} else {
+			printf("[SDL] Error: %s\n", TTF_GetError());
+		}
 	}
 
 	FE_RETURN_VOID;

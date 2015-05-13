@@ -10,6 +10,7 @@
 #include "ferite.h"
 #include "SDL.h"
 #include "SDL_image.h"
+#include "SDL_ttf.h"
 #include "ini.h"
 
 #ifndef FALSE
@@ -111,6 +112,10 @@ static int _WedoEngine_InitializeSDL() {
 	Uint32 flags = SDL_INIT_VIDEO | SDL_INIT_EVENTS;
 	if ( SDL_Init(flags) < 0 )
 		return FALSE;
+	if( TTF_Init() < 0 ) {
+		SDL_Quit();
+		return FALSE;
+	}
 	return TRUE;
 }
 
@@ -134,6 +139,7 @@ static void _WedoEngine_TerminateSDL() {
 		_WedoEngine_Window = NULL;
 	}
 
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -167,6 +173,7 @@ static SDL_Renderer *_WedoEngine_GetRenderer() {
 #include "WedoEngineFeriteString.c.in"
 #include "WedoEngineFeriteImage.c.in"
 #include "WedoEngineFeriteTexture.c.in"
+#include "WedoEngineFeriteFont.c.in"
 
 static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, script->mainns, "Engine", FENS_NS);
@@ -176,6 +183,7 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	FeriteNamespace *string_namespace = NULL;
 	FeriteClass *image_class = ferite_register_inherited_class(script, engine_namespace, "Image", NULL);
 	FeriteClass *texture_class = ferite_register_inherited_class(script, engine_namespace, "Texture", NULL);
+	FeriteClass *font_class = ferite_register_inherited_class(script, engine_namespace, "Font", NULL);
 
 	nsb = ferite_find_namespace(script, script->mainns, "Array", FENS_NS);
 	array_namespace = (nsb && nsb->data ? nsb->data : ferite_register_namespace(script, "Array", script->mainns));
@@ -248,7 +256,9 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "currentTime", "", _WedoEngine_FeriteCurrentTime);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "loadImage", "s", _WedoEngine_FeriteLoadImage);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "loadTexture", "s", _WedoEngine_FeriteLoadTexture);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "loadFont", "sn", _WedoEngine_FeriteLoadFont);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "renderTexture", "onnnn", _WedoEngine_FeriteRenderTexture);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "renderText", "osnnnnn", _WedoEngine_FeriteRenderText);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "hasIntersection", "nnnnnnnn", _WedoEngine_FeriteHasIntersection);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "parseINI", "s", _WedoEngine_FeriteParseINI);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "writeToFile", "ss", _WedoEngine_FeriteWriteToFile);
@@ -259,6 +269,8 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_CLASS_FUNCTION(script, image_class, "getPixel", "nn", _WedoImage_FeriteGetPixel);
 
 	REGISTER_CLASS_FUNCTION(script, texture_class, "destructor", "", _WedoTexture_FeriteDestructor);
+
+	REGISTER_CLASS_FUNCTION(script, font_class, "destructor", "", _WedoFont_FeriteDestructor);
 }
 
 void WedoEngine_Terminate() {

@@ -1,0 +1,12 @@
+
+FE_NATIVE_FUNCTION( _WedoFont_FeriteDestructor ) {
+	FeriteObject *self = FE_CONTAINER_TO_OBJECT;
+	TTF_Font *font = self->odata;
+	if( font ) {
+		TTF_CloseFont(font);
+		font = NULL;
+		self->odata = NULL;
+	}
+	self = NULL;
+	FE_RETURN_VOID;
+}
