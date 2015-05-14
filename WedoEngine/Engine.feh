@@ -1,4 +1,4 @@
-uses 'Array';
+uses 'WedoEngine/WedoEngine/Array';
 
 namespace modifies Engine {
 	class KeyboardEvent {
