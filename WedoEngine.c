@@ -10,6 +10,7 @@
 #include "ferite.h"
 #include "SDL.h"
 #include "SDL_image.h"
+#include "SDL_mixer.h"
 #include "SDL_ttf.h"
 #include "ini.h"
 
@@ -30,6 +31,7 @@
 
 static SDL_Window   *_WedoEngine_Window = NULL;
 static SDL_Renderer *_WedoEngine_Renderer = NULL;
+static Mix_Music    *_WedoEngine_Music = NULL;
 
 static FeriteVariable *_WedoEngine_CreateFeriteKeyboardEvent( FeriteScript *script, FeriteNamespace *namespace, SDL_Event *event ) {
 	FeriteNamespaceBucket *nsb = ferite_find_namespace(script, namespace, "KeyboardEvent", FENS_CLS);
@@ -116,6 +118,14 @@ static int _WedoEngine_InitializeSDL() {
 		SDL_Quit();
 		return FALSE;
 	}
+
+	Mix_Init(0);
+	int audio_rate = 22050;
+	Uint16 audio_format = AUDIO_S16; /* 16-bit stereo */
+	int audio_channels = 2;
+	int audio_buffers = 4096;
+	Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers);
+
 	return TRUE;
 }
 
@@ -138,6 +148,9 @@ static void _WedoEngine_TerminateSDL() {
 		SDL_DestroyWindow(_WedoEngine_Window);
 		_WedoEngine_Window = NULL;
 	}
+
+	Mix_CloseAudio();
+	Mix_Quit();
 
 	TTF_Quit();
 	SDL_Quit();
@@ -173,6 +186,7 @@ static SDL_Renderer *_WedoEngine_GetRenderer() {
 #include "WedoEngineFeriteString.c.in"
 #include "WedoEngineFeriteImage.c.in"
 #include "WedoEngineFeriteTexture.c.in"
+#include "WedoEngineFeriteSound.c.in"
 #include "WedoEngineFeriteFont.c.in"
 
 static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
@@ -183,6 +197,7 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	FeriteNamespace *string_namespace = NULL;
 	FeriteClass *image_class = ferite_register_inherited_class(script, engine_namespace, "Image", NULL);
 	FeriteClass *texture_class = ferite_register_inherited_class(script, engine_namespace, "Texture", NULL);
+	FeriteClass *sound_class = ferite_register_inherited_class(script, engine_namespace, "Sound", NULL);
 	FeriteClass *font_class = ferite_register_inherited_class(script, engine_namespace, "Font", NULL);
 
 	nsb = ferite_find_namespace(script, script->mainns, "Array", FENS_NS);
@@ -264,6 +279,11 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "setClipRectangle", "nnnn", _WedoEngine_FeriteSetClipRectangle);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "parseINI", "s", _WedoEngine_FeriteParseINI);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "writeToFile", "ss", _WedoEngine_FeriteWriteToFile);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "playMusic", "s", _WedoEngine_FeritePlayMusic);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "stopMusic", "", _WedoEngine_FeriteStopMusic);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "loadSound", "s", _WedoEngine_FeriteLoadSound);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "playSound", "o", _WedoEngine_FeritePlaySound);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "setSoundChannels", "n", _WedoEngine_FeriteSetSoundChannels);
 
 	REGISTER_CLASS_FUNCTION(script, image_class, "destructor", "", _WedoImage_FeriteDestructor);
 	REGISTER_CLASS_FUNCTION(script, image_class, "toTexture", "", _WedoImage_FeriteToTexture);
@@ -271,6 +291,8 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_CLASS_FUNCTION(script, image_class, "getPixel", "nn", _WedoImage_FeriteGetPixel);
 
 	REGISTER_CLASS_FUNCTION(script, texture_class, "destructor", "", _WedoTexture_FeriteDestructor);
+
+	REGISTER_CLASS_FUNCTION(script, sound_class, "destructor", "", _WedoSound_FeriteDestructor);
 
 	REGISTER_CLASS_FUNCTION(script, font_class, "destructor", "", _WedoFont_FeriteDestructor);
 }

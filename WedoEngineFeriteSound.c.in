@@ -1,0 +1,9 @@
+
+
+FE_NATIVE_FUNCTION( _WedoSound_FeriteDestructor ) {
+	FeriteObject *self = FE_CONTAINER_TO_OBJECT;
+	Mix_Chunk *chunk = (Mix_Chunk *)self->odata;
+	Mix_FreeChunk(chunk);
+	self->odata = NULL;
+	FE_RETURN_VOID;
+}

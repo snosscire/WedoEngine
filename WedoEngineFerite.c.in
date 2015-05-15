@@ -364,3 +364,67 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteWriteToFile ) {
 	}
 	FE_RETURN_FALSE;
 }
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteSetSoundChannels ) {
+	double channels = 0.0;
+	ferite_get_parameters(params, 1, &channels);
+	Mix_AllocateChannels((int)channels);
+	FE_RETURN_VOID;
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeritePlayMusic ) {
+	FeriteString *file = NULL;
+	ferite_get_parameters(params, 1, &file);
+
+	Mix_HaltMusic();
+	if( _WedoEngine_Music  ) {
+		Mix_FreeMusic(_WedoEngine_Music);
+		_WedoEngine_Music = NULL;
+	}
+	_WedoEngine_Music = Mix_LoadMUS(file->data);
+	if( _WedoEngine_Music ) {
+		Mix_PlayMusic(_WedoEngine_Music, -1);
+	} else {
+		printf("[SDL] Error: %s\n", Mix_GetError());
+	}
+
+	FE_RETURN_VOID;
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteStopMusic ) {
+	Mix_HaltMusic();
+	if( _WedoEngine_Music ) {
+		Mix_FreeMusic(_WedoEngine_Music);
+		_WedoEngine_Music = NULL;
+	}
+	FE_RETURN_VOID;
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteLoadSound ) {
+	FeriteString *path = NULL;
+	Mix_Chunk *sound = NULL;
+	
+	ferite_get_parameters(params, 1, &path);
+	
+	sound = Mix_LoadWAV(path->data);
+	if( sound ) {
+		FeriteNamespaceBucket *nsb = ferite_find_namespace(script, script->mainns, "Engine.Sound", FENS_CLS);
+		FeriteVariable *sound_variable = ferite_build_object(script, nsb->data);
+		VAO(sound_variable)->odata = sound;
+		MARK_VARIABLE_AS_DISPOSABLE(sound_variable);
+		FE_RETURN_VAR(sound_variable);
+	}
+
+	FE_RETURN_NULL_OBJECT;
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeritePlaySound ) {
+	FeriteObject *sound = NULL;
+	Mix_Chunk *chunk = NULL;
+
+	ferite_get_parameters(params, 7, &sound);
+
+	chunk = sound->odata;
+	Mix_PlayChannel(-1, chunk, 0);
+	FE_RETURN_VOID;
+}
