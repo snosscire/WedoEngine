@@ -209,7 +209,7 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteRenderRectangle ) {
 	rectangle.x = x;
 	rectangle.y = y;
 	rectangle.w = width;
-	rectangle.h = width;
+	rectangle.h = height;
 
 	SDL_RenderFillRect(_WedoEngine_GetRenderer(), &rectangle);
 
@@ -312,6 +312,24 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteHasIntersection ) {
 		FE_RETURN_TRUE;
 
 	FE_RETURN_FALSE;
+}
+
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteSetClipRectangle ) {
+	double x = 0.0;
+	double y = 0.0;
+	double w = 0.0;
+	double h = 0.0;
+
+	ferite_get_parameters(params, 4, &x, &y, &w, &h);
+
+	SDL_Rect rectangle;
+	rectangle.x = x;
+	rectangle.y = y;
+	rectangle.w = w;
+	rectangle.h = h;
+	SDL_RenderSetClipRect(_WedoEngine_GetRenderer(), &rectangle);
+
+	FE_RETURN_VOID;
 }
 
 FE_NATIVE_FUNCTION( _WedoEngine_FeriteParseINI ) {

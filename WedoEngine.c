@@ -261,6 +261,7 @@ static void _WedoEngine_RegisterFeriteFunctions( FeriteScript *script) {
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "renderTexture", "onnnn", _WedoEngine_FeriteRenderTexture);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "renderText", "osnnnnn", _WedoEngine_FeriteRenderText);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "hasIntersection", "nnnnnnnn", _WedoEngine_FeriteHasIntersection);
+	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "setClipRectangle", "nnnn", _WedoEngine_FeriteSetClipRectangle);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "parseINI", "s", _WedoEngine_FeriteParseINI);
 	REGISTER_NAMESPACE_FUNCTION(script, engine_namespace, "writeToFile", "ss", _WedoEngine_FeriteWriteToFile);
 
