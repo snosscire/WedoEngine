@@ -192,6 +192,30 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteLoadFont ) {
 	FE_RETURN_NULL_OBJECT;
 }
 
+FE_NATIVE_FUNCTION( _WedoEngine_FeriteRenderRectangle ) {
+	double x = 0.0;
+	double y = 0.0;
+	double width = 0.0;
+	double height = 0.0;
+	double red = 0.0;
+	double green = 0.0;
+	double blue = 0.0;
+
+	ferite_get_parameters(params, 7, &x, &y, &width, &height, &red, &green, &blue);
+
+	SDL_SetRenderDrawColor(_WedoEngine_GetRenderer(), red, green, blue, 255);
+
+	SDL_Rect rectangle;
+	rectangle.x = x;
+	rectangle.y = y;
+	rectangle.w = width;
+	rectangle.h = width;
+
+	SDL_RenderFillRect(_WedoEngine_GetRenderer(), &rectangle);
+
+	FE_RETURN_VOID;
+}
+
 FE_NATIVE_FUNCTION( _WedoEngine_FeriteRenderTexture ) {
 	FeriteObject *texture_object = NULL;
 	double x = 0.0;
