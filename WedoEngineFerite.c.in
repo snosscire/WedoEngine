@@ -32,7 +32,7 @@ FE_NATIVE_FUNCTION( _WedoEngine_FeriteCreateWindow ) {
 	if( _WedoEngine_GetWindow() )
 		FE_RETURN_TRUE;
 
-	Uint32 flags = 0; /* SDL_WINDOW_SHOWN; */
+	Uint32 flags = SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL; /* SDL_WINDOW_SHOWN; */
 
 	SDL_Window *window = SDL_CreateWindow(
 			name->data,
